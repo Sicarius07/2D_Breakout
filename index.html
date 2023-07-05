@@ -33,6 +33,8 @@
         let paddleX = (canvas.width-paddleWidth)/2;
         let x = canvas.width/2;
         let y = canvas.height-30;
+        const ballRadius = 10;
+        let score = 0;
         let dx = 2;
         let dy = -2;
         let rightPressed = false;
@@ -46,18 +48,43 @@
             for(let r = 0; r<rowBrick; r++){
                 bricks[c][r] = {
                     x:c*(brickWidth+brickPadding) + brickOffsetLeft,
-                    y:r*(brickHeight+brickPadding) + brickOffsetUp
+                    y:r*(brickHeight+brickPadding) + brickOffsetUp,
+                    status: 1
                 };
             }
+        }
+        function drawScore(){
+            ctx.font = "12px Arial";
+            ctx.fillStyle = "#0095DD";
+            ctx.fillText(`Score: ${score}`, 8, 20);
         }
         function drawBricks(){
             for(let c = 0; c<columnBrick; c++){
                 for(let r = 0; r<rowBrick; r++){
-                    ctx.beginPath();
-                    ctx.rect(bricks[c][r].x, bricks[c][r].y, brickWidth, brickHeight);
-                    ctx.fillStyle = "#0095DD";
-                    ctx.fill();
-                    ctx.closePath();
+                    if(bricks[c][r].status===1){
+                        ctx.beginPath();
+                        ctx.rect(bricks[c][r].x, bricks[c][r].y, brickWidth, brickHeight);
+                        ctx.fillStyle = "#0095DD";
+                        ctx.fill();
+                        ctx.closePath();
+                    }
+                }
+            }
+        }
+        function collisionDetection(){
+            for(let c = 0; c<columnBrick; c++){
+                for(let r = 0; r<rowBrick; r++){
+                    const b = bricks[c][r];
+                    if(x>b.x && x<b.x+brickWidth && y>b.y && y<b.y+brickHeight && b.status === 1){
+                        bricks[c][r].status = 0;
+                        dy = -dy;
+                        score++;
+                    }
+                    if(score=== rowBrick*columnBrick){
+                        alert("You WIN!! Congrats!");
+                        document.location.reload();
+                        clearInterval(interval);
+                    }
                 }
             }
         }
@@ -95,6 +122,9 @@
             drawBricks();
             solidBall();
             paddle();
+            collisionDetection();
+            drawScore();
+
             if(y+dy-10<0){
                 dy = -dy;
             }
