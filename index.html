@@ -13,37 +13,45 @@
         background: #eee;
         display: block;
         margin: 0 auto;
+        border: 1px solid black;
       }
     </style>
 </head>
 <body>
-    <canvas id="myCanvas" width="480" height="320"></canvas>
+    <canvas id="myCanvas"></canvas>
     <script>
         const canvas = document.getElementById("myCanvas");
         const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth-20;
+        canvas.height = window.innerHeight-20;
         const paddleHeight = 10;
         const paddleWidth = 70;
-        const rowBrick = 3;
-        const columnBrick = 5;
+        const rowBrick = 5;
+        const columnBrick = 15;
         const brickPadding = 10;
         const brickWidth = 75;
         const brickHeight = 20;
-        const brickOffsetLeft = 30;
-        const brickOffsetUp = 20;
+        const brickOffsetLeft = 280;
+        const brickOffsetUp = 50;
         let paddleX = (canvas.width-paddleWidth)/2;
         let x = canvas.width/2;
         let y = canvas.height-30;
         const ballRadius = 10;
         let score = 0;
-        let dx = 2;
-        let dy = -2;
+        let dx = 3;
+        let dy = -3;
         let rightPressed = false;
         let leftPressed = false;
         let lives = 3;
         document.addEventListener("keydown", keyDownHandler, false);
         document.addEventListener("keyup", keyUpHandler, false);
         document.addEventListener("mousemove", mouseMovementHandler, false);
+        document.addEventListener("resize", resizeCanvas);
 
+        function resizeCanvas(){
+            canvas.width = window.innerWidth-20;
+            canvas.height = window.innerHeight-20;
+        }
 
         function gameOver() {
             alert("Game Over");
@@ -174,9 +182,13 @@
 
             if(y+dy-10<0){
                 dy = -dy;
+                dy>0? dy+=0.05 : dy-=0.05;
+                dx>0? dx+=0.05 : dx-=0.05;
             }
             else if(y+dy+10>canvas.height-paddleHeight && x>paddleX && x<paddleX+paddleWidth){
                 dy = -dy;
+                dy>0? dy+=0.05 : dy-=0.05;
+                dx>0? dx+=0.05 : dx-=0.05;
             }
             else if(y+dy+10>canvas.height){
                 if(lives===1){
@@ -204,6 +216,7 @@
             }
             y += dy;
             x += dx;
+
             requestAnimationFrame(draw);
         }
         draw();
