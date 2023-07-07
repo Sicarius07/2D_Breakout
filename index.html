@@ -39,9 +39,44 @@
         let dy = -2;
         let rightPressed = false;
         let leftPressed = false;
+        let lives = 3;
         document.addEventListener("keydown", keyDownHandler, false);
         document.addEventListener("keyup", keyUpHandler, false);
+        document.addEventListener("mousemove", mouseMovementHandler, false);
 
+
+        function gameOver() {
+            alert("Game Over");
+            lives = 3;
+            score = 0;
+            dx = 2;
+            dy = -2;
+            x = canvas.width / 2;
+            y = canvas.height - 30;
+            paddleX = (canvas.width - paddleWidth) / 2;
+            resetBricks();
+            draw();
+        }
+        function youWon() {
+            alert("Game Over");alert("You WIN!! Congrats!");
+            lives = 3;
+            score = 0;
+            dx = 2;
+            dy = -2;
+            x = canvas.width / 2;
+            y = canvas.height - 30;
+            paddleX = (canvas.width - paddleWidth) / 2;
+            resetBricks();
+            draw();
+        }
+
+        function resetBricks() {
+            for (let c = 0; c < columnBrick; c++) {
+                for (let r = 0; r < rowBrick; r++) {
+                    bricks[c][r].status = 1;
+                }
+            }
+        }
         const bricks = [];
         for(let c = 0; c<columnBrick; c++){
             bricks[c] = [];
@@ -51,6 +86,12 @@
                     y:r*(brickHeight+brickPadding) + brickOffsetUp,
                     status: 1
                 };
+            }
+        }
+        function mouseMovementHandler(e){
+            let relativeX = e.clientX - canvas.offsetLeft;
+            if(relativeX > 0 && relativeX < canvas.width){
+                paddleX = relativeX - paddleWidth/2;
             }
         }
         function drawScore(){
@@ -71,6 +112,12 @@
                 }
             }
         }
+        function drawLives() {
+            ctx.font = "16px Arial";
+            ctx.fillStyle = "#0095DD";
+            ctx.fillText(`Lives: ${lives}`, canvas.width - 65, 20);
+        }
+
         function collisionDetection(){
             for(let c = 0; c<columnBrick; c++){
                 for(let r = 0; r<rowBrick; r++){
@@ -81,9 +128,8 @@
                         score++;
                     }
                     if(score=== rowBrick*columnBrick){
-                        alert("You WIN!! Congrats!");
-                        document.location.reload();
-                        clearInterval(interval);
+                        youWon();
+                        return;
                     }
                 }
             }
@@ -124,6 +170,7 @@
             paddle();
             collisionDetection();
             drawScore();
+            drawLives();
 
             if(y+dy-10<0){
                 dy = -dy;
@@ -132,9 +179,19 @@
                 dy = -dy;
             }
             else if(y+dy+10>canvas.height){
-                alert("Game Over");
-                document.location.reload();
-                clearInterval(interval);
+                if(lives===1){
+                    gameOver();
+                    return;
+                    
+                }else{
+                    lives--;
+                    dx = 3;
+                    dy = -3;
+                    x = canvas.width/2;
+                    y = canvas.height-30;
+                    paddleX = (canvas.width-paddleWidth)/2;
+                }
+
             }
             if(x+dx-10<0 || x+dx+10>canvas.width){
                 dx = -dx;
@@ -147,8 +204,11 @@
             }
             y += dy;
             x += dx;
+            requestAnimationFrame(draw);
         }
-        const interval = setInterval(draw, 10);
+        draw();
+        
+
 
     </script>
 </body>
